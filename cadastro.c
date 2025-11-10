@@ -16,54 +16,26 @@ struct Produtos listaProdutos[] = {
 
 // Função para ler o maior ID de um produto
 int obterId() {
-    FILE *arquivo;
-    int proximoId = 1; // Valor padrão se não houver ID
+    FILE *arquivoId;
+    int proximoId = 1;
 
-    arquivo = fopen("proximoId.txt", "r");
+    arquivoId = fopen("proximoId.txt", "r");
 
-    if (arquivo != NULL) {
+    if (arquivoId != NULL) {
         // Se o arquivo existir ele tentar ler o número
-        if(fscanf(arquivo, "%d", &proximoId) != 1) {
+        if(fscanf(arquivoId, "%d", &proximoId) != 1) {
             // Se a leitura falhar, assume 1, mas fecha o arquivo
             proximoId = 1;
         }
-        fclose(arquivo);
+        fclose(arquivoId);
     }
-    // Se o arquivo for NULL ele retorna 1
-
     return(proximoId);
 }
-
-// Função para salvar o proximo ID
-void salvarProximoId (int novoId) {
-    FILE *arquivo;
-
-    // Abre o arquivo para escrita
-    arquivo = fopen("proximoId.txt", "w");
-    if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo.");
-        return;
-    }
-
-    // Escreve o novo valor do próximo ID
-    
-    fprintf(arquivo, "%d", novoId);
-
-    fclose(arquivo);
-};
 
 
 int main () {
     int opcao, i = 0;
     int idGlobal = obterId();
-
-    // Criando arquivos necessários para o programa
-    FILE *arquivoProduto = fopen("produtos.txt", "w");
-    if (arquivoProduto == NULL) {
-        printf("Erro ao criar arquivos.");
-        return 1;
-    }
-    fclose(arquivoProduto);
 
     while (1) {
         //Lista de opções que o usuário tem
@@ -80,28 +52,51 @@ int main () {
         scanf("%d", &opcao);
 
         switch (opcao) {
-            case 1: //Caso 1: Adicionar produto ao struct array produtos e depois ao arquivo
-            struct Produtos criarProduto;
+            case 1: {
+                //Caso 1: Adicionar produto ao struct array produtos e depois ao arquivo 
+                struct Produtos criarProduto;
 
-            // Incrementa o ID no struct e adiciona ele em um arquivo separado
-            criarProduto.idProduto = idGlobal;
-            idGlobal++;
-            salvarProximoId(idGlobal);
+                // Incrementa o ID no struct e adiciona ele em um arquivo separado
+                criarProduto.idProduto = idGlobal;
+                idGlobal++;
+                FILE *arquivoId = fopen("proximoId.txt", "w");
+                if (arquivoId == NULL) {
+                    printf("Erro ao abrir arquivos. ");
+                    return 1;
+                }
+                fprintf(arquivoId, "%d", idGlobal);
+                fclose(arquivoId);
 
-            printf("Digite o nome do produto: \n");
-            scanf("%s", &criarProduto.nomeProduto);
+                // Pergunta os valores a serem adicionados ao usuário
+                printf("Digite o nome do produto: \n");
+                scanf("%s", &criarProduto.nomeProduto);
 
-            printf("Digite o tipo do produto: \n");
-            scanf("%s", &criarProduto.tipoProduto);
+                printf("Digite o tipo do produto: \n");
+                scanf("%s", &criarProduto.tipoProduto);
 
-            printf("Digite o preço do produto: \n");
-            scanf("%s", &criarProduto.precoProduto);
+                printf("Digite o preço do produto: \n");
+                scanf("%s", &criarProduto.precoProduto);
 
-            printf("Digite a quantidade de produto no estoque: \n");
-            scanf("&d", &criarProduto.quantidadeProduto);
+                printf("Digite a quantidade de produto no estoque: \n");
+                scanf("%d", &criarProduto.quantidadeProduto);
 
-            break;
+                // Adiciona os valores ao arquivo "produtos.txt"
+                FILE *arquivoProdutos = fopen("produtos.txt", "a+");
+                if (arquivoProdutos == NULL) {
+                    printf("Erro ao abrir o arquivo.");
+                    return 1;
+                }
+                fprintf(arquivoProdutos, "%d, ", criarProduto.idProduto);
+                fprintf(arquivoProdutos, "%s, ", criarProduto.nomeProduto);
+                fprintf(arquivoProdutos, "%s, ", criarProduto.tipoProduto);
+                fprintf(arquivoProdutos, "%s, ", criarProduto.precoProduto);
+                fprintf(arquivoProdutos, "%d\n", criarProduto.quantidadeProduto);
+                fclose(arquivoProdutos);
+                break;
+            }
+            case 7:
+                printf("Programa finalizado com sucesso.");
+                return 0;
         }
     }
-    return 0;
 }
