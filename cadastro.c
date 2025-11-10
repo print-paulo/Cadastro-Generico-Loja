@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define MAX_LINHA 256
 
 struct Produtos{
         int idProduto;
         char nomeProduto[50];
         char tipoProduto[50];
-        char precoProduto[50];
+        float precoProduto;
         int quantidadeProduto;
+        char fornecedorProduto[50];
     };
 
 struct Produtos listaProdutos[] = {
@@ -36,6 +38,7 @@ int obterId() {
 int main () {
     int opcao, i = 0;
     int idGlobal = obterId();
+    char linha[MAX_LINHA];
 
     while (1) {
         //Lista de opções que o usuário tem
@@ -74,11 +77,14 @@ int main () {
                 printf("Digite o tipo do produto: \n");
                 scanf("%s", &criarProduto.tipoProduto);
 
-                printf("Digite o preço do produto: \n");
-                scanf("%s", &criarProduto.precoProduto);
+                printf("Digite o preço do produto: (sem numeros)\n");
+                scanf("%f", &criarProduto.precoProduto);
 
                 printf("Digite a quantidade de produto no estoque: \n");
                 scanf("%d", &criarProduto.quantidadeProduto);
+
+                printf("Digite qual o fornecedor do produto: \n");
+                scanf("%s", &criarProduto.fornecedorProduto);
 
                 // Adiciona os valores ao arquivo "produtos.txt"
                 FILE *arquivoProdutos = fopen("produtos.txt", "a+");
@@ -86,17 +92,51 @@ int main () {
                     printf("Erro ao abrir o arquivo.");
                     return 1;
                 }
-                fprintf(arquivoProdutos, "%d, ", criarProduto.idProduto);
-                fprintf(arquivoProdutos, "%s, ", criarProduto.nomeProduto);
-                fprintf(arquivoProdutos, "%s, ", criarProduto.tipoProduto);
-                fprintf(arquivoProdutos, "%s, ", criarProduto.precoProduto);
-                fprintf(arquivoProdutos, "%d\n", criarProduto.quantidadeProduto);
+                fprintf(arquivoProdutos, "%d,", criarProduto.idProduto);
+                fprintf(arquivoProdutos, "%s,", criarProduto.nomeProduto);
+                fprintf(arquivoProdutos, "%s,", criarProduto.tipoProduto);
+                fprintf(arquivoProdutos, "%.2f,", criarProduto.precoProduto);
+                fprintf(arquivoProdutos, "%d,", criarProduto.quantidadeProduto);
+                fprintf(arquivoProdutos, "%s\n", criarProduto.fornecedorProduto);
                 fclose(arquivoProdutos);
                 break;
             }
-            case 7:
+            case 2: {
+                int id, quantidade;
+                float preco;
+                char nome[50], tipo[50], fornecedor[50];
+                // Abre o arquivo produtos.txt para leitura
+                FILE *arquivoProdutos = fopen("produtos.txt", "r");
+                if (arquivoProdutos == NULL) {
+                    printf("Nenhum produto cadastrado.\n");
+                    break;
+                }
+                // Imprime topo da tabela
+                printf("----------------------------------------------------------------------------\n");
+                printf("| ID | Produto | Categoria | Preço (R$) | Quantidade | Fornecedor |\n");
+                printf("----------------------------------------------------------------------------\n");
+
+                // Lê cada linha da tabela e "coleta" apenas os elementos ("elimina" as virgulas)
+                while (fgets(linha, sizeof(linha), arquivoProdutos) != NULL) {
+                    int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^,]", // O %49[^,] vai ler uma string até 49 caracteres OU até uma virgula
+                                            &id, nome, tipo, &preco, &quantidade, fornecedor);
+                    if (itensLidos == 6) {
+                        printf("| %-2d | %-7s | %-9s | %-10.2f | %-10d | %-10s \n",
+                                id, nome, tipo, preco, quantidade, fornecedor);
+                    }
+                    else {
+                       printf("Erro de formato na linha.\n");
+                       return 1; 
+                    }
+                }
+                fclose(arquivoProdutos);
+                printf("----------------------------------------------------------------------------\n");
+                break;
+            }
+            case 7: {
                 printf("Programa finalizado com sucesso.");
                 return 0;
+            }
         }
     }
 }
