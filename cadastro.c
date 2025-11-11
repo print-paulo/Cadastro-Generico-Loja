@@ -135,7 +135,7 @@ int main () {
             }
             case 3 : {
                 int idAlvo, id, quantidade;
-                int encontrado = 1;
+                int encontrado = 0;
                 float preco;
                 char nome[50], tipo[50], fornecedor[50];
                 
