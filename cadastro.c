@@ -34,6 +34,13 @@ int obterId() {
     return(proximoId);
 }
 
+void removerNovaLinha (char *str) {
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
+    }
+}
+
 
 int main () {
     int opcao, i = 0;
@@ -53,6 +60,8 @@ int main () {
         printf("Escolha a opção que desejas (1-7) \n");
         scanf("%d", &opcao);
 
+        int c; while ((c = getchar()) != '\n' && c != EOF);
+
         switch (opcao) {
             case 1: {
                 //Caso 1: Adicionar produto ao struct array produtos e depois ao arquivo 
@@ -71,10 +80,12 @@ int main () {
 
                 // Pergunta os valores a serem adicionados ao usuário
                 printf("Digite o nome do produto: \n");
-                scanf("%s", &criarProduto.nomeProduto);
+                fgets(criarProduto.nomeProduto, 50, stdin);
+                removerNovaLinha(criarProduto.nomeProduto);
 
                 printf("Digite o tipo do produto: \n");
-                scanf("%s", &criarProduto.tipoProduto);
+                fgets(criarProduto.tipoProduto, 50, stdin);
+                removerNovaLinha(criarProduto.tipoProduto);
 
                 printf("Digite o preço do produto: (sem numeros)\n");
                 scanf("%f", &criarProduto.precoProduto);
@@ -82,8 +93,11 @@ int main () {
                 printf("Digite a quantidade de produto no estoque: \n");
                 scanf("%d", &criarProduto.quantidadeProduto);
 
+                int c; while ((c = getchar()) != '\n' && c != EOF); // Limpa o buffer
+
                 printf("Digite qual o fornecedor do produto: \n");
-                scanf("%s", &criarProduto.fornecedorProduto);
+                fgets(criarProduto.fornecedorProduto, 50, stdin);
+                removerNovaLinha(criarProduto.fornecedorProduto);
 
                 // Adiciona os valores ao arquivo "produtos.txt"
                 FILE *arquivoProdutos = fopen("produtos.txt", "a+");
@@ -164,7 +178,7 @@ int main () {
                         encontrado = 1;
                         int opcao;
                         
-                        printf("1 - Nome\n");
+                        printf("\n1 - Nome\n");
                         printf("2 - Tipo\n");
                         printf("3 - Preço\n");
                         printf("4 - Quantidade\n");
@@ -179,12 +193,14 @@ int main () {
                         switch (opcao) {
                             case 1: {
                                 printf("Para qual nome deseja alterar?\n");
-                                scanf("%s", &nome);
+                                fgets(nome, 50, stdin);
+                                removerNovaLinha(nome);
                                 break;
                             }
                             case 2: {
                                 printf("Para qual tipo deseja alterar?\n");
-                                scanf("%s", &tipo);
+                                fgets(tipo, 50, stdin);
+                                removerNovaLinha(tipo);
                                 break;
                             }
                             case 3: {
@@ -199,7 +215,8 @@ int main () {
                             }
                             case 5: {
                                 printf("Para qual nome de fornecedor deseja alterar?\n");
-                                scanf("%s", &fornecedor);
+                                fgets(fornecedor, 50, stdin);
+                                removerNovaLinha(fornecedor);
                                 break;
                             }
                         }
@@ -221,7 +238,7 @@ int main () {
 
                 if (encontrado == 1) {
                     if (remove("produtos.txt") == 0 && rename("temp.txt", "produtos.txt") == 0) {
-                        printf("\nProduto ID %d alterado com sucesso!", idAlvo);
+                        printf("\nProduto ID %d alterado com sucesso!\n", idAlvo);
                     }
                     else {
                         printf("ERRO CRÍTICO: Falha ao aplicar alteração.\n");
