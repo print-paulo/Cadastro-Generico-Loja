@@ -45,11 +45,10 @@ int main () {
         printf("----------TABELA DADOS ATACADÃO----------\n\n");
         printf("1 - Adicionar Produto\n");
         printf("2 - Listar Produtos\n");
-        printf("3 - Inserir Informações\n");
-        printf("4 - Alterar Produto\n");
-        printf("5 - Exluir Produto\n");
-        printf("6 - Buscar\n");
-        printf("7 - Sair\n\n");
+        printf("3 - Alterar dados de um produto\n");
+        printf("4 - Exluir Produto\n");
+        printf("5 - Buscar\n");
+        printf("6 - Sair\n\n");
 
         printf("Escolha a opção que desejas (1-7) \n");
         scanf("%d", &opcao);
@@ -112,40 +111,135 @@ int main () {
                     break;
                 }
                 // Imprime topo da tabela
-                printf("----------------------------------------------------------------------------\n");
+                printf("-------------------------------------------------------------------\n");
                 printf("| ID | Produto | Categoria | Preço (R$) | Quantidade | Fornecedor |\n");
-                printf("----------------------------------------------------------------------------\n");
+                printf("-------------------------------------------------------------------\n");
 
                 // Lê cada linha da tabela e "coleta" apenas os elementos ("elimina" as virgulas)
                 while (fgets(linha, sizeof(linha), arquivoProdutos) != NULL) {
-                    int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^,]", // O %49[^,] vai ler uma string até 49 caracteres OU até uma virgula
+                    // O sscanf vai "separar" os valores da string em variáveis (StringSCANF)
+                    int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]", // O %49[^,] vai ler uma string até 49 caracteres OU até uma virgula
                                             &id, nome, tipo, &preco, &quantidade, fornecedor);
                     if (itensLidos == 6) {
-                        printf("| %-2d | %-7s | %-9s | %-10.2f | %-10d | %-10s \n",
-                                id, nome, tipo, preco, quantidade, fornecedor);
+                        printf("| %-2d | %-7s | %-9s | %-10.2f | %-10d | %-10s |\n", // O -2 tá subtraindo a quantidade de caracteres do topo da tabela para
+                                id, nome, tipo, preco, quantidade, fornecedor);     // ficar alinhado
                     }
                     else {
                        printf("Erro de formato na linha.\n");
                        return 1; 
                     }
                 }
+                printf("-------------------------------------------------------------------\n");
                 fclose(arquivoProdutos);
-                printf("----------------------------------------------------------------------------\n");
                 break;
             }
             case 3 : {
+                int idAlvo, id, quantidade;
+                int encontrado = 1;
+                float preco;
+                char nome[50], tipo[50], fornecedor[50];
                 
+                printf("Escreva o ID do produto que deseja ALTERAR: \n");
+                int c; while((c = getchar()) != '\n' && c != EOF); // Limpa o buffer do idAlvo
+                scanf("%d", &idAlvo);
+                
+                // Criando o arquivo produtos em formato de leitura
+                FILE *arquivoProdutos = fopen("produtos.txt", "r");
+                if (arquivoProdutos == NULL) {
+                    printf("Nenhum produto cadastrado.\n");
+                    break;
+                }
+                // Criando um arquivo temporário para evitar corrupção dos dados
+                FILE *arquivoTemporario = fopen("temp.txt", "w");
+                if (arquivoTemporario == NULL) {
+                    printf("Falha ao criar arquivo temporário.\n");
+                    return 1;
+                }
+                
+                // Loop while que verifica cada linha no arquivo
+                while (fgets(linha, sizeof(linha), arquivoProdutos)) {
+                    int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]",  // O sscanf está separando os valores da string nas variáveis (explicado no case 2)
+                                            &id, nome, tipo, &preco, &quantidade, fornecedor);
+                    if (itensLidos == 6 && id == idAlvo) {
+                        encontrado = 1;
+                        int opcao;
+                        
+                        printf("1 - Nome\n");
+                        printf("2 - Tipo\n");
+                        printf("3 - Preço\n");
+                        printf("4 - Quantidade\n");
+                        printf("5 - Nome do fornecedor\n\n");
+                        
+                        printf("O que deseja alterar? (1-6)\n");
+                        while((c = getchar()) != '\n' && c != EOF);
+                        scanf("%d", &opcao);
+                        
+                        while((c = getchar()) != '\n' && c != EOF);
+
+                        switch (opcao) {
+                            case 1: {
+                                printf("Para qual nome deseja alterar?\n");
+                                scanf("%s", &nome);
+                                break;
+                            }
+                            case 2: {
+                                printf("Para qual tipo deseja alterar?\n");
+                                scanf("%s", &tipo);
+                                break;
+                            }
+                            case 3: {
+                                printf("Para qual preço deseja alterar?\n");
+                                scanf("%f", &preco);
+                                break;
+                            }
+                            case 4: {
+                                printf("Para qual quantidade deseja alterar?\n");
+                                scanf("%d", &quantidade);
+                                break;
+                            }
+                            case 5: {
+                                printf("Para qual nome de fornecedor deseja alterar?\n");
+                                scanf("%s", &fornecedor);
+                                break;
+                            }
+                        }
+                        fprintf(arquivoTemporario, "%d,%s,%s,%.2f,%d,%s\n",
+                                id, nome, tipo, preco, quantidade, fornecedor);
+                    }
+                    else if (itensLidos == 6) {
+                        fprintf(arquivoTemporario, "%d,%s,%s,%.2f,%d,%s\n",
+                                id, nome, tipo, preco, quantidade, fornecedor);
+                    }
+                    else {
+                        printf("AVISO: LINHA IGNORADA POR ERRO DE FORMATO.\n");
+                        continue;
+                    }
+                }
+                // Fechando arquivos abertos previamente
+                fclose(arquivoProdutos);
+                fclose(arquivoTemporario);
+
+                if (encontrado == 1) {
+                    if (remove("produtos.txt") == 0 && rename("temp.txt", "produtos.txt") == 0) {
+                        printf("\nProduto ID %d alterado com sucesso!", idAlvo);
+                    }
+                    else {
+                        printf("ERRO CRÍTICO: Falha ao aplicar alteração.\n");
+                    }
+                }
+                else {
+                    printf("\nProduto com ID %d não encontrado.\n", idAlvo);
+                    remove("temp.txt");
+                }
+                break;
             }
             case 4: {
-
+                break;
             }
             case 5: {
-
+                break;
             }
             case 6: {
-
-            }
-            case 7: {
                 printf("Programa finalizado com sucesso.");
                 return 0;
             }
