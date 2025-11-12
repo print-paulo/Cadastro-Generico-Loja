@@ -49,7 +49,7 @@ int main () {
 
     while (1) {
         //Lista de opções que o usuário tem
-        printf("----------TABELA DADOS ATACADÃO----------\n\n");
+        printf("\n----------TABELA DADOS ATACADÃO----------\n\n");
         printf("1 - Adicionar Produto\n");
         printf("2 - Listar Produtos\n");
         printf("3 - Alterar dados de um produto\n");
@@ -125,9 +125,9 @@ int main () {
                     break;
                 }
                 // Imprime topo da tabela
-                printf("-------------------------------------------------------------------\n");
-                printf("| ID | Produto | Categoria | Preço (R$) | Quantidade | Fornecedor |\n");
-                printf("-------------------------------------------------------------------\n");
+                printf("-------------------------------------------------------------------------------------------------\n");
+                printf("| ID | Produto           | Categoria           | Preço (R$) | Quantidade | Fornecedor           |\n");
+                printf("-------------------------------------------------------------------------------------------------\n");
 
                 // Lê cada linha da tabela e "coleta" apenas os elementos ("elimina" as virgulas)
                 while (fgets(linha, sizeof(linha), arquivoProdutos) != NULL) {
@@ -135,7 +135,7 @@ int main () {
                     int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]", // O %49[^,] vai ler uma string até 49 caracteres OU até uma virgula
                                             &id, nome, tipo, &preco, &quantidade, fornecedor);
                     if (itensLidos == 6) {
-                        printf("| %-2d | %-7s | %-9s | %-10.2f | %-10d | %-10s |\n", // O -2 tá subtraindo a quantidade de caracteres do topo da tabela para
+                        printf("| %-2d | %-17s | %-19s | %-10.2f | %-10d | %-20s |\n", // O -2 tá subtraindo a quantidade de caracteres do topo da tabela para
                                 id, nome, tipo, preco, quantidade, fornecedor);     // ficar alinhado
                     }
                     else {
@@ -143,7 +143,7 @@ int main () {
                        return 1; 
                     }
                 }
-                printf("-------------------------------------------------------------------\n");
+                printf("-------------------------------------------------------------------------------------------------\n\n");
                 fclose(arquivoProdutos);
                 break;
             }
@@ -154,8 +154,8 @@ int main () {
                 char nome[50], tipo[50], fornecedor[50];
                 
                 printf("Escreva o ID do produto que deseja ALTERAR: \n");
-                int c; while((c = getchar()) != '\n' && c != EOF); // Limpa o buffer do idAlvo
                 scanf("%d", &idAlvo);
+                int c; while((c = getchar()) != '\n' && c != EOF); // Limpa o buffer do idAlvo
                 
                 // Criando o arquivo produtos em formato de leitura
                 FILE *arquivoProdutos = fopen("produtos.txt", "r");
@@ -185,7 +185,6 @@ int main () {
                         printf("5 - Nome do fornecedor\n\n");
                         
                         printf("O que deseja alterar? (1-6)\n");
-                        while((c = getchar()) != '\n' && c != EOF);
                         scanf("%d", &opcao);
                         
                         while((c = getchar()) != '\n' && c != EOF);
