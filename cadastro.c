@@ -250,6 +250,72 @@ int main () {
                 break;
             }
             case 4: {
+                int idAlvo, id, quantidade;
+                int encontrado = 0;
+                float preco;
+                char nome[50], tipo[50], fornecedor[50];
+
+                printf("Escreva o ID do produto que deseja EXCLUIR: \n");
+                scanf("%d", &idAlvo);
+                int c; while((c = getchar()) != '\n' && c != EOF); // Limpa o buffer do idAlvo
+
+                // Criando o arquivo produtos em formato de leitura
+                FILE *arquivoProdutos = fopen("produtos.txt", "r");
+                if (arquivoProdutos == NULL) {
+                    printf("Nenhum produto cadastrado.\n");
+                    break;
+                }
+                // Criando um arquivo temporário para evitar corrupção dos dados
+                FILE *arquivoTemporario = fopen("temp.txt", "w");
+                if (arquivoTemporario == NULL) {
+                    printf("Falha ao criar arquivo temporário.\n");
+                    return 1;
+                }
+
+                while (fgets(linha, sizeof(linha), arquivoProdutos)) {
+                    int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]",  // O sscanf está separando os valores da string nas variáveis (explicado no case 2)
+                                            &id, nome, tipo, &preco, &quantidade, fornecedor);
+                    if (itensLidos == 6 && id == idAlvo) {
+                        encontrado = 1;
+                        char opcao;
+
+                        printf("TEM CERTEZA QUE DESEJA APAGAR O PRODUTO? (s/n) \n");
+                        scanf(" %c", &opcao);
+                        int c; while ((c = getchar()) != '\n' && c != EOF);
+                        
+                        if (opcao == 's') {
+                            continue;
+                        }
+                        else if (opcao == 'n') {
+                            fprintf(arquivoTemporario, "%d,%s,%s,%.2f,%d,%s\n",
+                                id, nome, tipo, preco, quantidade, fornecedor);
+                        }
+                    }
+                    else if (itensLidos == 6) {
+                        fprintf(arquivoTemporario, "%d,%s,%s,%.2f,%d,%s\n",
+                                id, nome, tipo, preco, quantidade, fornecedor);
+                    }
+                    else {
+                        printf("LINHA IGNORADA POR ERRO DE FORMATO");
+                        continue;
+                    }
+                }
+                // Fechando arquivos abertos previamente
+                fclose(arquivoProdutos);
+                fclose(arquivoTemporario);
+
+                if (encontrado == 1) {
+                    if (remove("produtos.txt") == 0 && rename("temp.txt", "produtos.txt") == 0) {
+                        printf("\nProduto ID %d alterado com sucesso!\n", idAlvo);
+                    }
+                    else {
+                        printf("ERRO CRÍTICO: Falha ao aplicar alteração.\n");
+                    }
+                }
+                else {
+                    printf("\nProduto com ID %d não encontrado.\n", idAlvo);
+                    remove("temp.txt");
+                }
                 break;
             }
             case 5: {
