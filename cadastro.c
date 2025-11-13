@@ -12,10 +12,6 @@ struct Produtos{
         char fornecedorProduto[50];
     };
 
-struct Produtos listaProdutos[] = {
-    
-};
-
 // Função para ler o maior ID de um produto
 int obterId() {
     FILE *arquivoId;
@@ -282,7 +278,7 @@ int main () {
                         printf("TEM CERTEZA QUE DESEJA APAGAR O PRODUTO? (s/n) \n");
                         scanf(" %c", &opcao);
                         int c; while ((c = getchar()) != '\n' && c != EOF);
-                        
+
                         if (opcao == 's') {
                             continue;
                         }
