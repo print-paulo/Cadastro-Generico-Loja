@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #define MAX_LINHA 256
 
 struct Produtos{
@@ -34,6 +35,12 @@ void removerNovaLinha (char *str) {
     size_t len = strlen(str);
     if (len > 0 && str[len - 1] == '\n') {
         str[len - 1] = '\0';
+    }
+}
+
+void toLower(char *str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        str[i] = tolower((unsigned char)str[i]);
     }
 }
 
@@ -131,8 +138,8 @@ int main () {
                     int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]", // O %49[^,] vai ler uma string até 49 caracteres OU até uma virgula
                                             &id, nome, tipo, &preco, &quantidade, fornecedor);
                     if (itensLidos == 6) {
-                        printf("| %-2d | %-17s | %-19s | %-10.2f | %-10d | %-20s |\n", // O -2 tá subtraindo a quantidade de caracteres do topo da tabela para
-                                id, nome, tipo, preco, quantidade, fornecedor);     // ficar alinhado
+                        printf("| %-2d | %-17s | %-19s | %-10.2f | %-10d | %-20s |\n", // O -2 tá subtraindo a quantidade de caracteres do topo da tabela para ficar alinhado
+                                id, nome, tipo, preco, quantidade, fornecedor);
                     }
                     else {
                        printf("Erro de formato na linha.\n");
@@ -315,6 +322,72 @@ int main () {
                 break;
             }
             case 5: {
+                int opcao, id, quantidade;
+                int encontrado = 0;
+                float preco;
+                char nome[50], tipo[50], fornecedor[50], buscaUsuario[50];
+
+                printf("\n----------------- Buscar -----------------\n");
+                printf("1 - Nome\n");
+                printf("2 - Tipo\n");
+                printf("3 - A-Z\n");
+                printf("4 - Z-A\n");
+                printf("5 - Maior preço\n");
+                printf("6 - Menor preço\n");
+                printf("----------------------------------------------\n");
+                
+                printf("O que deseja pesquisar?\n");
+                scanf("%d", &opcao);
+                int c; while ((c = getchar()) != '\n' && c != EOF);
+
+                // Abrindo o arquivo produtos em formato de leitura
+                FILE *arquivoProdutos = fopen("produtos.txt", "r");
+                if (arquivoProdutos == NULL) {
+                    printf("Nenhum produto cadastrado.\n");
+                    break;
+                }
+
+                switch (opcao) {
+                    case 1: {
+                        char nome_temp[50];
+
+                        printf("Digite o nome do produto a ser pesquisado\n");
+                        fgets(buscaUsuario, 50, stdin);
+                        removerNovaLinha(buscaUsuario);
+                        toLower(buscaUsuario);
+
+                        printf("-------------------------------------------------------------------------------------------------\n");
+                        printf("| ID | Produto           | Categoria           | Preço (R$) | Quantidade | Fornecedor           |\n");
+                        printf("-------------------------------------------------------------------------------------------------\n");
+
+                        while (fgets(linha, sizeof(linha), arquivoProdutos)) {
+                            int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]",  // O sscanf está separando os valores da string nas variáveis (explicado no case 2)
+                                                    &id, nome, tipo, &preco, &quantidade, fornecedor);
+
+                            strcpy(nome_temp, nome);
+                            toLower(nome_temp);
+
+                            if (itensLidos == 6 && strstr(nome_temp, buscaUsuario) != NULL) {
+                                encontrado = 1;
+
+                                printf("| %-2d | %-17s | %-19s | %-10.2f | %-10d | %-20s |\n", // O -2 tá subtraindo a quantidade de caracteres do topo da tabela para alinhado
+                                id, nome, tipo, preco, quantidade, fornecedor);
+                            }
+                            else {
+                                continue;
+                            }
+                        }
+                        fclose(arquivoProdutos);
+
+                        printf("-------------------------------------------------------------------------------------------------\n");
+                        
+                        if (encontrado != 1) {
+                            printf("O item com o nome: '%s' não foi encontrado", buscaUsuario);
+                        }
+                        break;
+                    }
+                }
+                
                 break;
             }
             case 6: {
