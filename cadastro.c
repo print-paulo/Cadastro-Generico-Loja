@@ -389,7 +389,7 @@ int main () {
                     case 2: {
                         char tipo_temp[50];
 
-                        printf("Digite o tipo do produto a ser pesquisado\n");
+                        printf("Digite o tipo (categoria) do produto a ser pesquisado\n");
                         fgets(buscaUsuario, 50, stdin);
                         removerNovaLinha(buscaUsuario);
                         toLower(buscaUsuario);
@@ -422,6 +422,18 @@ int main () {
                         if (encontrado != 1) {
                             printf("O item com o tipo: '%s' não foi encontrado", buscaUsuario);
                         }
+                        break;
+                    }
+                    case 3: {
+                        break;
+                    }
+                    case 4: {
+                        break;
+                    }
+                    case 5: {
+                        break;
+                    }
+                    case 6: {
                         break;
                     }
                 }
