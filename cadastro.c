@@ -3,15 +3,20 @@
 #include <string.h>
 #include <ctype.h>
 #define MAX_LINHA 256
+#define MAX_PRODUTOS 100
 
-struct Produtos{
+struct Produtos {
         int idProduto;
         char nomeProduto[50];
         char tipoProduto[50];
         float precoProduto;
         int quantidadeProduto;
         char fornecedorProduto[50];
-    };
+};
+
+struct Produtos listaProdutos[MAX_PRODUTOS] = {
+
+};
 
 // Função para ler o maior ID de um produto
 int obterId() {
@@ -46,10 +51,29 @@ void toLower(char *str) {
 
 
 int main () {
-    int opcao, i = 0;
+    int opcao, i = 0, id, quantidade;
+    float preco;
     int idGlobal = obterId();
-    char linha[MAX_LINHA];
+    char linha[MAX_LINHA], tipo[50], nome[50], fornecedor[50];
 
+    FILE *arquivoProdutos = fopen("produtos.txt", "r"); 
+
+    while (fgets(linha, sizeof(linha), arquivoProdutos)) {
+        int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]", // O %49[^,] vai ler uma string até 49 caracteres OU até uma virgula
+                                &id, nome, tipo, &preco, &quantidade, fornecedor);
+        
+        if (itensLidos == 6) {
+            listaProdutos[i].idProduto = id;
+            strcpy(listaProdutos[i].nomeProduto, nome);
+            strcpy(listaProdutos[i].tipoProduto, tipo);
+            listaProdutos[i].precoProduto = preco;
+            listaProdutos[i].quantidadeProduto = quantidade;
+            strcpy(listaProdutos[i].fornecedorProduto, fornecedor);
+            i++;
+        }
+    }
+    fclose(arquivoProdutos);
+    
     while (1) {
         //Lista de opções que o usuário tem
         printf("\n----------TABELA DADOS ATACADÃO----------\n\n");
