@@ -386,8 +386,45 @@ int main () {
                         }
                         break;
                     }
+                    case 2: {
+                        char tipo_temp[50];
+
+                        printf("Digite o tipo do produto a ser pesquisado\n");
+                        fgets(buscaUsuario, 50, stdin);
+                        removerNovaLinha(buscaUsuario);
+                        toLower(buscaUsuario);
+
+                        printf("-------------------------------------------------------------------------------------------------\n");
+                        printf("| ID | Produto           | Categoria           | Preço (R$) | Quantidade | Fornecedor           |\n");
+                        printf("-------------------------------------------------------------------------------------------------\n");
+
+                        while (fgets(linha, sizeof(linha), arquivoProdutos)) {
+                            int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]",  // O sscanf está separando os valores da string nas variáveis (explicado no case 2)
+                                                    &id, nome, tipo, &preco, &quantidade, fornecedor);
+
+                            strcpy(tipo_temp, tipo);
+                            toLower(tipo_temp);
+
+                            if (itensLidos == 6 && strstr(tipo_temp, buscaUsuario) != NULL) {
+                                encontrado = 1;
+
+                                printf("| %-2d | %-17s | %-19s | %-10.2f | %-10d | %-20s |\n", // O -2 tá subtraindo a quantidade de caracteres do topo da tabela para alinhado
+                                id, nome, tipo, preco, quantidade, fornecedor);
+                            }
+                            else {
+                                continue;
+                            }
+                        }
+                        fclose(arquivoProdutos);
+
+                        printf("-------------------------------------------------------------------------------------------------\n");
+                        
+                        if (encontrado != 1) {
+                            printf("O item com o tipo: '%s' não foi encontrado", buscaUsuario);
+                        }
+                        break;
+                    }
                 }
-                
                 break;
             }
             case 6: {
