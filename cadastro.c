@@ -364,13 +364,6 @@ int main () {
                 scanf("%d", &opcao);
                 int c; while ((c = getchar()) != '\n' && c != EOF);
 
-                // Abrindo o arquivo produtos em formato de leitura
-                FILE *arquivoProdutos = fopen("produtos.txt", "r");
-                if (arquivoProdutos == NULL) {
-                    printf("Nenhum produto cadastrado.\n");
-                    break;
-                }
-
                 switch (opcao) {
                     case 1: {
                         char nome_temp[50];
@@ -383,6 +376,13 @@ int main () {
                         printf("-------------------------------------------------------------------------------------------------\n");
                         printf("| ID | Produto           | Categoria           | Preço (R$) | Quantidade | Fornecedor           |\n");
                         printf("-------------------------------------------------------------------------------------------------\n");
+
+                        // Abrindo o arquivo produtos em formato de leitura
+                        FILE *arquivoProdutos = fopen("produtos.txt", "r");
+                        if (arquivoProdutos == NULL) {
+                            printf("Nenhum produto cadastrado.\n");
+                            break;
+                        }
 
                         while (fgets(linha, sizeof(linha), arquivoProdutos)) {
                             int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]",  // O sscanf está separando os valores da string nas variáveis (explicado no case 2)
@@ -403,7 +403,7 @@ int main () {
                         }
                         fclose(arquivoProdutos);
 
-                        printf("-------------------------------------------------------------------------------------------------\n");
+                        printf("-------------------------------------------------------------------------------------------------\n\n");
                         
                         if (encontrado != 1) {
                             printf("O item com o nome: '%s' não foi encontrado", buscaUsuario);
@@ -421,6 +421,13 @@ int main () {
                         printf("-------------------------------------------------------------------------------------------------\n");
                         printf("| ID | Produto           | Categoria           | Preço (R$) | Quantidade | Fornecedor           |\n");
                         printf("-------------------------------------------------------------------------------------------------\n");
+
+                        // Abrindo o arquivo produtos em formato de leitura
+                        FILE *arquivoProdutos = fopen("produtos.txt", "r");
+                        if (arquivoProdutos == NULL) {
+                            printf("Nenhum produto cadastrado.\n");
+                            break;
+                        }
 
                         while (fgets(linha, sizeof(linha), arquivoProdutos)) {
                             int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]",  // O sscanf está separando os valores da string nas variáveis (explicado no case 2)
@@ -441,7 +448,7 @@ int main () {
                         }
                         fclose(arquivoProdutos);
 
-                        printf("-------------------------------------------------------------------------------------------------\n");
+                        printf("-------------------------------------------------------------------------------------------------\n\n");
                         
                         if (encontrado != 1) {
                             printf("O item com o tipo: '%s' não foi encontrado", buscaUsuario);
@@ -449,6 +456,77 @@ int main () {
                         break;
                     }
                     case 3: {
+                        int i = 0;
+                        char nomeTemp1, nomeTemp2;
+
+                        // IMPLEMENTAR CONVERSÃO LOWER
+                        
+                        // Abrindo o arquivo produtos em formato de leitura
+                        FILE *arquivoProdutos = fopen("produtos.txt", "r");
+                        if (arquivoProdutos == NULL) {
+                            printf("Nenhum produto cadastrado.\n");
+                            break;
+                        }
+                        
+                        // COLETANDO QUANTIDADE DE PRODUTOS
+                        while (fgets(linha, sizeof(linha), arquivoProdutos)) {
+                            int itensLidos = sscanf(linha, "%d,%49[^,],%49[^,],%f,%d,%49[^\n]",  // O sscanf está separando os valores da string nas variáveis (explicado no case 2)
+                                                    &id, nome, tipo, &preco, &quantidade, fornecedor);
+
+                            if (itensLidos == 6) {
+                                listaProdutos[i].idProduto = id;
+                                strcpy(listaProdutos[i].nomeProduto, nome);
+                                strcpy(listaProdutos[i].tipoProduto, tipo);
+                                listaProdutos[i].precoProduto = preco;
+                                listaProdutos[i].quantidadeProduto = quantidade;
+                                strcpy(listaProdutos[i].fornecedorProduto, fornecedor);
+                                
+                                i++;
+                            }
+                            else {
+                                printf("Erro de formatação de arquivo.");
+                                break;
+                            }
+                        }
+                        fclose(arquivoProdutos);
+
+                        int numProdutos = i;
+
+                        struct Produtos temp; // Variável temporária para troca
+                        int j, k;
+                        
+                        // BUBBLE SORT + Comparação de letra:
+                        // Loop externo: (percorre o array do início ao fim)
+                        for (j = 0; j < numProdutos - 1; j++) {
+                            // Loop interno: (compara e troca elementos adjacentes)
+                            for (k = 0; k < numProdutos - 1 - j; k++) {
+                                
+                                // Comparação: Verifica se o produto K é "maior" que o produto K+1
+                                // Usamos strcmp: se > 0, o produto está em ordem errada (ex: Z vem antes de A)
+                                if (strcmp(listaProdutos[k].nomeProduto, listaProdutos[k+1].nomeProduto) > 0) {
+                                    
+                                    // TROCA COMPLETA DO STRUCT:
+                                    temp = listaProdutos[k];
+                                    listaProdutos[k] = listaProdutos[k+1];
+                                    listaProdutos[k+1] = temp;
+                                }
+                            }
+                        }
+
+                        printf("-------------------------------------------------------------------------------------------------\n");
+                        printf("| ID | Produto           | Categoria           | Preço (R$) | Quantidade | Fornecedor           |\n");
+                        printf("-------------------------------------------------------------------------------------------------\n");
+
+                        for (j = 0; j < numProdutos; j++) {
+                            printf("| %-2d | %-17s | %-19s | %-10.2f | %-10d | %-20s |\n",
+                                    listaProdutos[j].idProduto,
+                                    listaProdutos[j].nomeProduto,
+                                    listaProdutos[j].tipoProduto,
+                                    listaProdutos[j].precoProduto,
+                                    listaProdutos[j].quantidadeProduto,
+                                    listaProdutos[j].fornecedorProduto);
+                        }
+                        printf("-------------------------------------------------------------------------------------------------\n\n");
                         break;
                     }
                     case 4: {
